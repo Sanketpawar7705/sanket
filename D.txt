@@ -1,0 +1,414 @@
+Assignment = 3
+Step 1 = Create main instance ubuntu
+         t2micro
+		 create key .pem
+		 click all ssh
+		 volume 15
+		 lounch
+		
+		2nd instance = server1
+		ubuntu
+		t2micro
+		key same
+		click all ssh
+		lounch
+		
+		3rd instance = server2
+		ubuntu
+		t2micro
+		key same
+		click all ssh
+		lounch
+		
+		connect main instance to terminal
+		sudo apt-get update
+		mkdir keys
+		cd keys
+		pwd
+		copy path
+		
+		open 2nd terminal
+		cd downloads
+		dir
+		scp -i M1.pem M1.pem ubuntu@(paste ip address main instance):(Keys path paste)
+		
+		go main terminal
+		ls(key show)
+		install ansible four commands
+		ansible --version
+		cd /etc/ansible
+		sudo mkdir inventory
+		ls
+		cd inventory
+		sudo vim firstinventory
+		=>[production]
+          server1 ansible_host=3.110.115.11
+          server2 ansible_host=13.201.98.2
+
+          [production:vars]
+          ansible_python_interpreter=/usr/bin/python3
+          ansible_user=ubuntu
+          ansible_ssh_private_key_file=/home/ubuntu/keys/name.pem
+		  esc shift :wq
+		  sudo su
+		  ls
+		  ansible production -i firstinventory -m ping
+		  yes
+		  yes
+		  enter 
+		  yes
+		  
+		  ansible production -i firstinventory -a "sudo apt-get update"
+		  ansible production -i firstinventory -a "sudo apt install openjdk-17-jdk -y"
+		  ansible production -i firstinventory -a "java --version"
+		  ansible production -i firstinventory -a "whoami"
+		  ansible production -i firstinventory -a "uptime"
+		  ansible production -i firstinventory -a "lscpu"
+		  ansible production -i firstinventory -a "df -h"
+		  ansible production -i firstinventory -a "free -h"
+		  
+		  ansible-inventory --list
+		  ansible production -i firstinventory -a "which git"
+		  
+		  
+		  
+Assignment = 4
+           ******Assignment = 4
+            1.date => in inventory create yml files
+	date.yml = - name: Dates playbook
+                   hosts: all
+                   tasks:
+                    - name: show date
+                      command: date
+
+                       - name: show user
+                         command: whoami
+			
+			ansible-playbook -i firstinventory date.yml			
+			
+     2.installjava.yml => 
+	 - name: install java17 and print version
+              hosts: all
+              become: yes
+              tasks:
+               - name: updateapt package manager
+                 apt:
+                  update_cache: yes
+
+               - name: install java
+                 apt:
+                  name: openjdk-17-jdk
+                  state: present
+
+               - name: chk java version
+                 command: java --version
+				 
+	ansible-playbook -i firstinventory installjava.yml
+
+3.NGINX.yml =>
+     - name: Install and start nginx server
+        hosts: all
+       become: yes
+       tasks:
+        - name: Install nginx
+         apt:
+          name: nginx
+          state: latest
+        - name: start nginx
+          service:
+          name: nginx
+          state: started
+
+4.shell script = >
+     First go to cd /home/ubuntu
+     sudo nano script.sh
+ #!/bin/bash
+echo "hello world"
+==> - name: Run a shell script on remote servers
+      hosts: servers
+      become: yes
+      tasks:
+       - name: Copy the shell script to the remote machine
+         copy.
+         src:/home/ubuntu/script.sh # Path to the local shell script
+         dest: /tmp/script.sh  #Path where the script will be copied on the remote server
+         mode: '0755' #Set execute permissions on the script
+        
+      - name: Run the shell script
+        command: /tmp/script.sh #Executes the script on the remote machine
+				
+5.multiple.yml =>
+      - name: Create multiple users
+        hosts: all
+        become: yes
+        vars:
+          num_users: 5
+          username_prefix: "user"
+          tasks:
+    - name: Create users with their username as password
+      user:
+      name: "{{ username_prefix}}{{ item }}"
+      state: present
+      create_home: yes
+      loop: "{{ range(1, num_users + 1) | list }}"		
+				
+Assignment 5 = 
+    
+	create instance kubernate ubuntu
+	t2medium
+	key create
+	click on ssh all
+	volume = 20
+	launch
+	
+	connect to terminal 
+	cd downloads
+	1. sudo apt-get update
+	==>docker install
+	2. sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
+	3. curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+	4. sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+	5. echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+	6. sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
+	7. sudo apt-get update
+	8. sudo apt-get install -y kubectl
+	9. curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+       sudo dpkg -i minikube_latest_amd64.deb
+
+	sudo groupadd docker
+	sudo usermod -aG docker ubuntu
+	newgrp docker
+	minikube start
+
+	kubectl create deployment hello-minikube --image=kicbase/echo-server:1.0
+    kubectl expose deployment hello-minikube --type=NodePort --port=8080
+	
+    docker ps
+	kubectl get services hello-minikube
+	minikube service hello-minikube
+	
+	
+	
+Assignment 1 = 
+  Q2 => 
+  new item
+  item name = job1
+  freestyle
+  ok
+  discription = archive artifact
+  source code managment = paste hkcoder git link
+  branch specifier = main
+  build step = invoke top level maven target
+  maven version = select
+  goals = clean install
+  Apply save
+  build now
+  configure
+  Add post build 
+  **/*.war
+  apply save 
+  build now
+  
+  
+  Q3 =>
+  manage jenkins - plugins - available plugins
+  zentimestamp install
+  restart click
+  login again
+  dashboard
+  new item
+  item name = job2
+  freestyle
+  copy = job1
+  ok
+  discription = archive artifact
+  source code managment = paste hkcoder git link
+  branch specifier = main
+  build step = invoke top level maven target
+  maven version = select
+  goals = clean install
+  Apply save
+  build now
+  configure 
+  change date pattern for build timestamp = dd-mm-yyyy
+  step build
+  execute shell
+ command =  mkdir -p versions
+            cp target.vprofile-v2.war versions/vprofile-V$BUILD_ID-$BUILD_TIMESTAMP.war
+  Apply save build now
+  worspace - versions
+  
+  
+  Q4 =>
+  all same as first
+  triggerd - build perodically = H/5 * * * *
+  apply save build now
+  
+  
+ Q5 =>
+manage jenkins - system - email notification
+SMTP = smtp.gmail.com 
+default user = @jenkins.com
+advance = use smtp authentication
+user name = email
+passwird = password(created app password is showing)
+click use ssl
+smtp port = 465
+replay to address = gmail
+test email = gmail
+test
+apply save
+job1
+configure
+**/*.wa
+post build - email notification = gamil
+apply save build now
+email notification is showing
+
+ 
+  Q6 =>
+  install docker on terminal
+  create item = job3
+  discription = node project
+  source code = git link add
+  branch = main
+  build step = execute shell
+  command = sudo docker build -t nodejsapp .
+            sudo docker run -d -p 3000:3000 nodejsapp
+			
+		apply save build now
+		
+  
+  Q7 =>
+  pipeline {
+    agent any
+    tools {
+        maven "MAVEN3"
+        jdk "JAVA17"
+    }
+    
+    stages {
+        stage ('fetch code'){
+            steps {
+                git branch: 'main', url: 'https://github.com/hkhcoder/vprofile-project.git'
+            }
+        }
+        stage ('Build code'){
+            steps{
+                sh 'mvn install -DskipTest'
+            }
+            post{
+                success {
+                    echo 'Archievinig artifact'
+                    archiveArtifacts artifacts: '/*.war'
+                }
+            }
+        }
+        
+        stage('Unit Test'){
+            steps{
+                sh 'mvn test'
+            }
+        }
+    }
+}
+  
+  
+  
+  Q8 =>
+pipeline {
+    agent any
+    stages {
+        stage ('fetch code'){
+            steps {
+                git branch: 'master', url: 'https://github.com/ajay-raut/nodeproject.git'
+            }
+        }
+        stage ('Build code'){
+            steps{
+                sh 'sudo docker build -t nodejsapp .'
+            }
+        }
+        
+        stage('run container'){
+            steps{
+                sh 'sudo docker run -d -p 3000:3000 nodejsapp'
+            }
+        }
+    }
+}
+  
+  
+Assignment 2 = aws lagty
+manage jenkins - node -
+agent name
+permant agent
+ok
+name = agent
+discription = agen1
+remote root directory = /home/ubuntu/jenkins
+labels =1
+lounch method = lounch agent viva ssh
+host = ip address
+credintial - add - jenkins
+kind = ssh user name with private key
+id = 1
+dis = agent 1
+username = root
+enter directly
+go to terminal 
+sudo su
+cd ..
+cd ..
+mkdir jenkins
+ssh-keygen
+enter 
+a,.txt
+enter (image show)
+sudo cat a.txt
+copy key and paste on jenkins
+sudo cat a.txt.pub
+cd /root/.ssh
+sudo nano autheo
+paste public key
+ctr x
+y 
+go jenkins
+host key varification
+non verifying statergy
+save
+click on agent - log
+dashboard
+
+Q1 = 
+new item
+name = j1
+pipeline
+ok
+
+pipeline {
+    agent {
+        label 'agent'
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch : 'main', url: 'https://github.com/amolgund0096/POSTGRESS.git'
+            }
+        }
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    sh 'docker compose up -d'
+                }
+            }
+        }
+    }
+}
+
+
+terminal = docker ps
+
+
+
+
